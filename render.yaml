@@ -25,11 +25,9 @@ services:
       - key: CLIENT_ORIGIN
         value: https://algolens-client.onrender.com
 
-  - type: web
+  - type: static
     name: algolens-client
-    plan: free
     rootDir: client
-    runtime: static
     buildCommand: npm install && npm run build
     staticPublishPath: ./dist
     headers:
