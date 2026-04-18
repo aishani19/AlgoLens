@@ -8,10 +8,10 @@ services:
   - type: web
     name: algolens-server
     plan: free
-    rootDir: .
+    rootDir: server
     runtime: node
-    buildCommand: cd client && npm install && npm run build && cd ../server && npm install
-    startCommand: node server/src/index.js
+    buildCommand: cd ../client && npm install && npm run build && cd ../server && npm install
+    startCommand: npm start
     healthCheckPath: /api/health
     envVars:
       - key: DATABASE_URL
