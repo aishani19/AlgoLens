@@ -1,15 +1,23 @@
 import "dotenv/config";
 import express from "express";
 import cors from "cors";
+import path from "path";
+import { fileURLToPath } from "url";
 import authRoutes from "./routes/auth.js";
 import userRoutes from "./routes/user.js";
 import { ensureSchema, pool } from "./db.js";
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const app = express();
 const port = Number(process.env.PORT) || 5000;
 const clientOrigin = process.env.CLIENT_ORIGIN || "http://localhost:5173";
 
-app.use(cors({ origin: clientOrigin, credentials: true }));
+// In production the client is served from same origin, so CORS is only needed in dev
+const isProduction = process.env.NODE_ENV === "production";
+if (!isProduction) {
+  app.use(cors({ origin: clientOrigin, credentials: true }));
+}
 app.use(express.json({ limit: "256kb" }));
 
 app.get("/api/health", async (_req, res) => {
@@ -23,6 +31,16 @@ app.get("/api/health", async (_req, res) => {
 
 app.use("/api/auth", authRoutes);
 app.use("/api/user", userRoutes);
+
+// Serve React client in production
+if (process.env.NODE_ENV === "production") {
+  const clientDist = path.join(__dirname, "..", "..", "client", "dist");
+  app.use(express.static(clientDist));
+  // SPA fallback — all non-API routes go to index.html
+  app.get("*", (_req, res) => {
+    res.sendFile(path.join(clientDist, "index.html"));
+  });
+}
 
 async function start() {
   if (!process.env.DATABASE_URL) {
