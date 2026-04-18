@@ -1,0 +1,13 @@
+{
+  "name": "algolens",
+  "private": true,
+  "version": "1.0.0",
+  "scripts": {
+    "install:all": "npm install && cd server && npm install && cd ../client && npm install",
+    "dev": "concurrently \"npm run dev --prefix server\" \"npm run dev --prefix client\"",
+    "db:init": "node server/scripts/initDb.js"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2"
+  }
+}
